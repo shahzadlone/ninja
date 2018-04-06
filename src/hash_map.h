@@ -16,8 +16,9 @@
 #define NINJA_MAP_H_
 
 #include <algorithm>
-#include <string.h>
-#include "string_piece.h"
+#include <string>
+#include <cstring>
+#include <string_view>
 
 // MurmurHash2, by Austin Appleby
 static inline
@@ -29,7 +30,7 @@ unsigned int MurmurHash2(const void* key, size_t len) {
   const unsigned char* data = (const unsigned char*)key;
   while (len >= 4) {
     unsigned int k;
-    memcpy(&k, data, sizeof k);
+    std::memcpy(&k, data, sizeof k);
     k *= m;
     k ^= k >> r;
     k *= m;
@@ -53,36 +54,24 @@ unsigned int MurmurHash2(const void* key, size_t len) {
 #if (__cplusplus >= 201103L) || (_MSC_VER >= 1900)
 #include <unordered_map>
 
-namespace std {
-template<>
-struct hash<StringPiece> {
-  typedef StringPiece argument_type;
-  typedef size_t result_type;
-
-  size_t operator()(StringPiece key) const {
-    return MurmurHash2(key.str_, key.len_);
-  }
-};
-}
-
 #elif defined(_MSC_VER)
 #include <hash_map>
 
 using stdext::hash_map;
 using stdext::hash_compare;
 
-struct StringPieceCmp : public hash_compare<StringPiece> {
-  size_t operator()(const StringPiece& key) const {
+struct StringViewCmp : public hash_compare<std::string_view> {
+  size_t operator()(std::string_view key) const {
     return MurmurHash2(key.str_, key.len_);
   }
-  bool operator()(const StringPiece& a, const StringPiece& b) const {
-    int cmp = memcmp(a.str_, b.str_, min(a.len_, b.len_));
+  bool operator()(std::string_view a, std::string_view b) const {
+    int cmp = memcmp(a.data(), b.data(), min(a.size(), b.size()));
     if (cmp < 0) {
       return true;
     } else if (cmp > 0) {
       return false;
     } else {
-      return a.len_ < b.len_;
+      return a.size() < b.size();
     }
   }
 };
@@ -94,26 +83,26 @@ using __gnu_cxx::hash_map;
 
 namespace __gnu_cxx {
 template<>
-struct hash<StringPiece> {
-  size_t operator()(StringPiece key) const {
-    return MurmurHash2(key.str_, key.len_);
+struct hash<std::string_view> {
+  size_t operator()(std::string_view key) const {
+    return MurmurHash2(key.data(), key.size());
   }
 };
 }
 #endif
 
-/// A template for hash_maps keyed by a StringPiece whose string is
+/// A template for hash_maps keyed by a std::string_view whose string is
 /// owned externally (typically by the values).  Use like:
 /// ExternalStringHash<Foo*>::Type foos; to make foos into a hash
-/// mapping StringPiece => Foo*.
+/// mapping std::string_view => Foo*.
 template<typename V>
 struct ExternalStringHashMap {
 #if (__cplusplus >= 201103L) || (_MSC_VER >= 1900)
-  typedef std::unordered_map<StringPiece, V> Type;
+  typedef std::unordered_map<std::string_view, V> Type;
 #elif defined(_MSC_VER)
-  typedef hash_map<StringPiece, V, StringPieceCmp> Type;
+  typedef hash_map<std::string_view, V, StringViewCmp> Type;
 #else
-  typedef hash_map<StringPiece, V> Type;
+  typedef hash_map<std::string_view, V> Type;
 #endif
 };
 

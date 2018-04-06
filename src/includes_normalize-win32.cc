@@ -14,7 +14,7 @@
 
 #include "includes_normalize.h"
 
-#include "string_piece.h"
+#include <string_view>
 #include "string_piece_util.h"
 #include "util.h"
 
@@ -33,7 +33,7 @@ bool IsPathSeparator(char c) {
 // Return true if paths a and b are on the same windows drive.
 // Return false if this funcation cannot check
 // whether or not on the same windows drive.
-bool SameDriveFast(StringPiece a, StringPiece b) {
+bool SameDriveFast(std::string_view a, std::string_view b) {
   if (a.size() < 3 || b.size() < 3) {
     return false;
   }
@@ -54,7 +54,7 @@ bool SameDriveFast(StringPiece a, StringPiece b) {
 }
 
 // Return true if paths a and b are on the same Windows drive.
-bool SameDrive(StringPiece a, StringPiece b)  {
+bool SameDrive(std::string_view a, std::string_view b)  {
   if (SameDriveFast(a, b)) {
     return true;
   }
@@ -73,7 +73,7 @@ bool SameDrive(StringPiece a, StringPiece b)  {
 // Check path |s| is FullPath style returned by GetFullPathName.
 // This ignores difference of path separator.
 // This is used not to call very slow GetFullPathName API.
-bool IsFullPathName(StringPiece s) {
+bool IsFullPathName(std::string_view s) {
   if (s.size() < 3 ||
       !islatinalpha(s[0]) ||
       s[1] != ':' ||
@@ -110,9 +110,9 @@ IncludesNormalize::IncludesNormalize(const std::string& relative_to) {
   split_relative_to_ = SplitStringPiece(relative_to_, '/');
 }
 
-std::string IncludesNormalize::AbsPath(StringPiece s) {
+std::string IncludesNormalize::AbsPath(std::string_view s) {
   if (IsFullPathName(s)) {
-    std::string result = s.AsString();
+    std::string result = std::string(s);
     for (size_t i = 0; i < result.size(); ++i) {
       if (result[i] == '\\') {
         result[i] = '/';
@@ -130,9 +130,9 @@ std::string IncludesNormalize::AbsPath(StringPiece s) {
 }
 
 std::string IncludesNormalize::Relativize(
-    StringPiece path, const std::vector<StringPiece>& start_list) {
+    std::string_view path, const std::vector<std::string_view>& start_list) {
   std::string abs_path = AbsPath(path);
-  std::vector<StringPiece> path_list = SplitStringPiece(abs_path, '/');
+  std::vector<std::string_view> path_list = SplitStringPiece(abs_path, '/');
   int i;
   for (i = 0; i < static_cast<int>(std::min(start_list.size(), path_list.size()));
        ++i) {
@@ -141,7 +141,7 @@ std::string IncludesNormalize::Relativize(
     }
   }
 
-  std::vector<StringPiece> rel_list;
+  std::vector<std::string_view> rel_list;
   rel_list.reserve(start_list.size() - i + path_list.size() - i);
   for (int j = 0; j < static_cast<int>(start_list.size() - i); ++j)
     rel_list.push_back("..");
@@ -164,11 +164,11 @@ bool IncludesNormalize::Normalize(const std::string& input,
   uint64_t slash_bits;
   if (!CanonicalizePath(copy, &len, &slash_bits, err))
     return false;
-  StringPiece partially_fixed(copy, len);
+  std::string_view partially_fixed(copy, len);
   std::string abs_input = AbsPath(partially_fixed);
 
   if (!SameDrive(abs_input, relative_to_)) {
-    *result = partially_fixed.AsString();
+    *result = std::string(partially_fixed);
     return true;
   }
   *result = Relativize(abs_input, split_relative_to_);

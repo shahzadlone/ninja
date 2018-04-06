@@ -928,19 +928,34 @@ bool Builder::ExtractDeps(CommandRunner::Result* result,
     for (auto & item : deps.ins_)
     {
       uint64_t slash_bits;
-      if (!CanonicalizePath(const_cast<char*>(item.str_), &item.len_, &slash_bits,
+
+      size_t size = item.size();
+      // What the hell?
+      // Who's bright idea was it to use const_cast?
+      if (!CanonicalizePath(const_cast<char*>(item.data()),
+                            &size,
+                            &slash_bits,
                             err))
+      {
+        item = item.substr(0, size);
         return false;
+      }
+      item = item.substr(0, size);
+
       deps_nodes->push_back(state_->GetNode(item, slash_bits));
     }
 
-    if (!g_keep_depfile) {
-      if (disk_interface_->RemoveFile(depfile) < 0) {
+    if (!g_keep_depfile)
+    {
+      if (disk_interface_->RemoveFile(depfile) < 0)
+      {
         *err = std::string("deleting depfile: ") + strerror(errno) + std::string("\n");
         return false;
       }
     }
-  } else {
+  }
+  else
+  {
     Fatal("unknown deps type '%s'", deps_type.c_str());
   }
 

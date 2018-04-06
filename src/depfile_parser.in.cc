@@ -104,10 +104,10 @@ bool DepfileParser::Parse(std::string* content, std::string* err) {
       continue;
 
     if (!is_target) {
-      ins_.push_back(StringPiece(filename, len));
-    } else if (!out_.str_) {
-      out_ = StringPiece(filename, len);
-    } else if (out_ != StringPiece(filename, len)) {
+      ins_.push_back(std::string_view(filename, len));
+    } else if (!out_.data()) {
+      out_ = std::string_view(filename, len);
+    } else if (out_ != std::string_view(filename, len)) {
       *err = "depfile has multiple output paths";
       return false;
     }

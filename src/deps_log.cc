@@ -244,7 +244,7 @@ bool DepsLog::Load(const std::string& path, State* state, std::string* err) {
       if (buf[path_size - 1] == '\0') --path_size;
       if (buf[path_size - 1] == '\0') --path_size;
       if (buf[path_size - 1] == '\0') --path_size;
-      StringPiece subpath(buf, path_size);
+      std::string_view subpath(buf, path_size);
       // It is not necessary to pass in a correct slash_bits here. It will
       // either be a Node that's in the manifest (in which case it will already
       // have a correct slash_bits that GetNode will look up), or it is an
@@ -330,7 +330,7 @@ bool DepsLog::Recompact(const std::string& path, std::string* err) {
   {
     item->set_id(-1);
   }
-  
+
   // Write out all deps again.
   for (int old_id = 0; old_id < (int)deps_.size(); ++old_id) {
     Deps* deps = deps_[old_id];
