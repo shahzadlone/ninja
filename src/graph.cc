@@ -14,6 +14,7 @@
 
 #include "graph.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 
@@ -320,7 +321,7 @@ std::string EdgeEnv::LookupVariable(const std::string& var) {
 
   if (recursive_) {
     std::vector<std::string>::const_iterator it;
-    if ((it = find(lookups_.begin(), lookups_.end(), var)) != lookups_.end()) {
+    if ((it = std::find(lookups_.begin(), lookups_.end(), var)) != lookups_.end()) {
       std::string cycle;
       for (; it != lookups_.end(); ++it)
         cycle.append(*it + " -> ");

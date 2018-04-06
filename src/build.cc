@@ -391,7 +391,8 @@ void Plan::ScheduleWork(std::map<Edge*, Want>::iterator want_e) {
   }
 }
 
-void Plan::EdgeFinished(Edge* edge, EdgeResult result) {
+void Plan::EdgeFinished(Edge* edge, EdgeResult result)
+{
   std::map<Edge*, Want>::iterator e = want_.find(edge);
   assert(e != want_.end());
   bool directly_wanted = e->second != kWantNothing;
