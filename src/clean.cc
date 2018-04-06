@@ -112,20 +112,20 @@ void Cleaner::PrintFooter() {
 int Cleaner::CleanAll(bool generator) {
   Reset();
   PrintHeader();
-  for (std::vector<Edge*>::iterator e = state_->edges_.begin();
-       e != state_->edges_.end(); ++e) {
+  for (const auto & item : state_->edges_)
+  {
     // Do not try to remove phony targets
-    if ((*e)->is_phony())
+    if (item->is_phony())
       continue;
     // Do not remove generator's files unless generator specified.
-    if (!generator && (*e)->GetBindingBool("generator"))
+    if (!generator && item->GetBindingBool("generator"))
       continue;
-    for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-         out_node != (*e)->outputs_.end(); ++out_node) {
-      Remove((*out_node)->path());
+    for (const auto & inner : item->outputs_)
+    {
+      Remove(inner->path());
     }
 
-    RemoveEdgeFiles(*e);
+    RemoveEdgeFiles(item);
   }
   PrintFooter();
   return status_;
@@ -138,9 +138,7 @@ void Cleaner::DoCleanTarget(Node* target) {
       Remove(target->path());
       RemoveEdgeFiles(e);
     }
-    for (std::vector<Node*>::iterator n = e->inputs_.begin(); n != e->inputs_.end();
-         ++n) {
-      Node* next = *n;
+    for (const auto & next : e->inputs_) {
       // call DoCleanTarget recursively if this node has not been visited
       if (cleaned_.count(next) == 0) {
         DoCleanTarget(next);
@@ -205,13 +203,14 @@ int Cleaner::CleanTargets(int target_count, char* targets[]) {
 void Cleaner::DoCleanRule(const Rule* rule) {
   assert(rule);
 
-  for (std::vector<Edge*>::iterator e = state_->edges_.begin();
-       e != state_->edges_.end(); ++e) {
-    if ((*e)->rule().name() == rule->name()) {
-      for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-           out_node != (*e)->outputs_.end(); ++out_node) {
-        Remove((*out_node)->path());
-        RemoveEdgeFiles(*e);
+  for (const auto & item : state_->edges_)
+  {
+    if (item->rule().name() == rule->name())
+    {
+      for (const auto & inner : item->outputs_)
+      {
+        Remove(inner->path());
+        RemoveEdgeFiles(item);
       }
     }
   }

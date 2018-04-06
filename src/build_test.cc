@@ -557,9 +557,9 @@ bool FakeCommandRunner::StartCommand(Edge* edge) {
       edge->rule().name() == "touch" ||
       edge->rule().name() == "touch-interrupt" ||
       edge->rule().name() == "touch-fail-tick2") {
-    for (std::vector<Node*>::iterator out = edge->outputs_.begin();
-         out != edge->outputs_.end(); ++out) {
-      fs_->Create((*out)->path(), "");
+    for (const auto & item : edge->outputs_)
+    {
+      fs_->Create(item->path(), "");
     }
   } else if (edge->rule().name() == "true" ||
              edge->rule().name() == "fail" ||

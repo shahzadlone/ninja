@@ -97,11 +97,12 @@ std::string BindingEnv::LookupWithFallback(const std::string& var,
 
 std::string EvalString::Evaluate(Env* env) const {
   std::string result;
-  for (TokenList::const_iterator i = parsed_.begin(); i != parsed_.end(); ++i) {
-    if (i->second == RAW)
-      result.append(i->first);
+  for (const auto & item : parsed_)
+  {
+    if (item.second == RAW)
+      result.append(item.first);
     else
-      result.append(env->LookupVariable(i->first));
+      result.append(env->LookupVariable(item.first));
   }
   return result;
 }
@@ -120,12 +121,12 @@ void EvalString::AddSpecial(StringPiece text) {
 
 std::string EvalString::Serialize() const {
   std::string result;
-  for (TokenList::const_iterator i = parsed_.begin();
-       i != parsed_.end(); ++i) {
+  for (const auto & item : parsed_)
+  {
     result.append("[");
-    if (i->second == SPECIAL)
+    if (item.second == SPECIAL)
       result.append("$");
-    result.append(i->first);
+    result.append(item.first);
     result.append("]");
   }
   return result;

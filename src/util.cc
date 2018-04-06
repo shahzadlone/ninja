@@ -291,8 +291,7 @@ void GetWin32EscapedString(const std::string& input, std::string* result) {
   result->push_back(kQuote);
   size_t consecutive_backslash_count = 0;
   std::string::const_iterator span_begin = input.begin();
-  for (std::string::const_iterator it = input.begin(), end = input.end(); it != end;
-       ++it) {
+  for (std::string::const_iterator it = input.begin(), end = input.end(); it != end; ++it) {
     switch (*it) {
       case kBackslash:
         ++consecutive_backslash_count;
@@ -387,13 +386,13 @@ const char* SpellcheckStringV(const std::string& text,
 
   int min_distance = kMaxValidEditDistance + 1;
   const char* result = NULL;
-  for (std::vector<const char*>::const_iterator i = words.begin();
-       i != words.end(); ++i) {
-    int distance = EditDistance(*i, text, kAllowReplacements,
+  for (const auto & item : words)
+  {
+    int distance = EditDistance(item, text, kAllowReplacements,
                                 kMaxValidEditDistance);
     if (distance < min_distance) {
       min_distance = distance;
-      result = *i;
+      result = item;
     }
   }
   return result;
