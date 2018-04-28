@@ -38,7 +38,7 @@ struct Node {
         slash_bits_(slash_bits),
         mtime_(-1),
         dirty_(false),
-        in_edge_(NULL),
+        in_edge_(nullptr),
         id_(-1) {}
 
   /// Return false on error.
@@ -114,7 +114,7 @@ private:
   /// edges to build.
   bool dirty_;
 
-  /// The Edge that produces this Node, or NULL when there is no
+  /// The Edge that produces this Node, or nullptr when there is no
   /// known edge to produce it.
   Edge* in_edge_;
 
@@ -133,7 +133,7 @@ struct Edge {
     VisitDone
   };
 
-  Edge() : rule_(NULL), pool_(NULL), env_(NULL), mark_(VisitNone),
+  Edge() : rule_(nullptr), pool_(nullptr), env_(nullptr), mark_(VisitNone),
            outputs_ready_(false), deps_missing_(false),
            implicit_deps_(0), order_only_deps_(0), implicit_outs_(0) {}
 

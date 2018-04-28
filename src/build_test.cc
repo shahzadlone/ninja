@@ -348,7 +348,7 @@ TEST_F(PlanTest, PoolWithRedundantEdges) {
   ASSERT_EQ("", err);
   ASSERT_TRUE(plan_.more_to_do());
 
-  Edge* edge = NULL;
+  Edge* edge = nullptr;
 
   std::deque<Edge*> initial_edges;
   FindWorkSorted(&initial_edges, 2);
@@ -442,7 +442,7 @@ TEST_F(PlanTest, PoolWithFailingEdge) {
 /// Fake implementation of CommandRunner, useful for tests.
 struct FakeCommandRunner : public CommandRunner {
   explicit FakeCommandRunner(VirtualFileSystem* fs) :
-      last_command_(NULL), fs_(fs) {}
+      last_command_(nullptr), fs_(fs) {}
 
   // CommandRunner impl
   virtual bool CanRunMore();
@@ -458,7 +458,7 @@ struct FakeCommandRunner : public CommandRunner {
 
 struct BuildTest : public StateTestWithBuiltinRules, public BuildLogUser {
   BuildTest() : config_(MakeConfig()), command_runner_(&fs_),
-                builder_(&state_, config_, NULL, NULL, &fs_),
+                builder_(&state_, config_, nullptr, nullptr, &fs_),
                 status_(config_) {
   }
 
@@ -485,8 +485,8 @@ struct BuildTest : public StateTestWithBuiltinRules, public BuildLogUser {
   /// State of command_runner_ and logs contents (if specified) ARE MODIFIED.
   /// Handy to check for NOOP builds, and higher-level rebuild tests.
   void RebuildTarget(const std::string& target, const char* manifest,
-                     const char* log_path = NULL, const char* deps_path = NULL,
-                     State* state = NULL);
+                     const char* log_path = nullptr, const char* deps_path = nullptr,
+                     State* state = nullptr);
 
   // Mark a path dirty.
   void Dirty(const std::string& path);
@@ -515,7 +515,7 @@ void BuildTest::RebuildTarget(const std::string& target, const char* manifest,
   AssertParse(pstate, manifest);
 
   std::string err;
-  BuildLog build_log, *pbuild_log = NULL;
+  BuildLog build_log, *pbuild_log = nullptr;
   if (log_path) {
     ASSERT_TRUE(build_log.Load(log_path, &err));
     ASSERT_TRUE(build_log.OpenForWrite(log_path, *this, &err));
@@ -523,7 +523,7 @@ void BuildTest::RebuildTarget(const std::string& target, const char* manifest,
     pbuild_log = &build_log;
   }
 
-  DepsLog deps_log, *pdeps_log = NULL;
+  DepsLog deps_log, *pdeps_log = nullptr;
   if (deps_path) {
     ASSERT_TRUE(deps_log.Load(deps_path, pstate, &err));
     ASSERT_TRUE(deps_log.OpenForWrite(deps_path, &err));
@@ -545,7 +545,7 @@ void BuildTest::RebuildTarget(const std::string& target, const char* manifest,
 
 bool FakeCommandRunner::CanRunMore() {
   // Only run one at a time.
-  return last_command_ == NULL;
+  return last_command_ == nullptr;
 }
 
 bool FakeCommandRunner::StartCommand(Edge* edge) {
@@ -594,7 +594,7 @@ bool FakeCommandRunner::WaitForCommand(Result* result) {
       result->status = ExitSuccess;
     else
       result->status = ExitFailure;
-    last_command_ = NULL;
+    last_command_ = nullptr;
     return true;
   }
 
@@ -603,7 +603,7 @@ bool FakeCommandRunner::WaitForCommand(Result* result) {
     result->status = ExitFailure;
   else
     result->status = ExitSuccess;
-  last_command_ = NULL;
+  last_command_ = nullptr;
   return true;
 }
 
@@ -615,7 +615,7 @@ std::vector<Edge*> FakeCommandRunner::GetActiveEdges() {
 }
 
 void FakeCommandRunner::Abort() {
-  last_command_ = NULL;
+  last_command_ = nullptr;
 }
 
 void BuildTest::Dirty(const std::string& path) {
@@ -1201,7 +1201,7 @@ TEST_F(BuildTest, PoolEdgesReadyButNotWanted) {
   fs_.RemoveFile("B.d.stamp");
 
   State save_state;
-  RebuildTarget("final.stamp", manifest, NULL, NULL, &save_state);
+  RebuildTarget("final.stamp", manifest, nullptr, nullptr, &save_state);
   EXPECT_GE(save_state.LookupPool("some_pool")->current_use(), 0);
 }
 
@@ -1493,7 +1493,7 @@ TEST_F(BuildWithLogTest, RestatMissingInput) {
   // See that an entry in the logfile is created, capturing
   // the right mtime
   BuildLog::LogEntry* log_entry = build_log_.LookupByOutput("out1");
-  ASSERT_TRUE(NULL != log_entry);
+  ASSERT_TRUE(nullptr != log_entry);
   ASSERT_EQ(restat_mtime, log_entry->mtime);
 
   // Now remove a file, referenced from depfile, so that target becomes
@@ -1510,7 +1510,7 @@ TEST_F(BuildWithLogTest, RestatMissingInput) {
 
   // Check that the logfile entry remains correctly set
   log_entry = build_log_.LookupByOutput("out1");
-  ASSERT_TRUE(NULL != log_entry);
+  ASSERT_TRUE(nullptr != log_entry);
   ASSERT_EQ(restat_mtime, log_entry->mtime);
 }
 
@@ -1674,7 +1674,7 @@ TEST_F(BuildWithLogTest, RspFileCmdLineChange) {
   // 3. Alter the entry in the logfile
   // (to simulate a change in the command line between 2 builds)
   BuildLog::LogEntry* log_entry = build_log_.LookupByOutput("out");
-  ASSERT_TRUE(NULL != log_entry);
+  ASSERT_TRUE(nullptr != log_entry);
   ASSERT_NO_FATAL_FAILURE(AssertHash(
         "cat out.rsp > out;rspfile=Original very long command",
         log_entry->command_hash));
@@ -1854,7 +1854,7 @@ TEST_F(BuildWithDepsLogTest, Straightforward) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     EXPECT_TRUE(builder.AddTarget("out", &err));
     ASSERT_EQ("", err);
@@ -1884,7 +1884,7 @@ TEST_F(BuildWithDepsLogTest, Straightforward) {
     ASSERT_TRUE(deps_log.Load("ninja_deps", &state, &err));
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     command_runner_.commands_ran_.clear();
     EXPECT_TRUE(builder.AddTarget("out", &err));
@@ -1925,7 +1925,7 @@ TEST_F(BuildWithDepsLogTest, ObsoleteDeps) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     EXPECT_TRUE(builder.AddTarget("out", &err));
     ASSERT_EQ("", err);
@@ -1954,7 +1954,7 @@ TEST_F(BuildWithDepsLogTest, ObsoleteDeps) {
     ASSERT_TRUE(deps_log.Load("ninja_deps", &state, &err));
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     command_runner_.commands_ran_.clear();
     EXPECT_TRUE(builder.AddTarget("out", &err));
@@ -1988,9 +1988,9 @@ TEST_F(BuildWithDepsLogTest, DepsIgnoredInDryRun) {
   ASSERT_NO_FATAL_FAILURE(AddCatRule(&state));
   ASSERT_NO_FATAL_FAILURE(AssertParse(&state, manifest));
 
-  // The deps log is NULL in dry runs.
+  // The deps log is nullptr in dry runs.
   config_.dry_run = true;
-  Builder builder(&state, config_, NULL, NULL, &fs_);
+  Builder builder(&state, config_, nullptr, nullptr, &fs_);
   builder.command_runner_.reset(&command_runner_);
   command_runner_.commands_ran_.clear();
 
@@ -2048,7 +2048,7 @@ TEST_F(BuildWithDepsLogTest, RestatDepfileDependencyDepsLog) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     EXPECT_TRUE(builder.AddTarget("out", &err));
     ASSERT_EQ("", err);
@@ -2074,7 +2074,7 @@ TEST_F(BuildWithDepsLogTest, RestatDepfileDependencyDepsLog) {
     ASSERT_TRUE(deps_log.Load("ninja_deps", &state, &err));
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     command_runner_.commands_ran_.clear();
     EXPECT_TRUE(builder.AddTarget("out", &err));
@@ -2107,7 +2107,7 @@ TEST_F(BuildWithDepsLogTest, DepFileOKDepsLog) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     EXPECT_TRUE(builder.AddTarget("fo o.o", &err));
     ASSERT_EQ("", err);
@@ -2128,7 +2128,7 @@ TEST_F(BuildWithDepsLogTest, DepFileOKDepsLog) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
 
     Edge* edge = state.edges_.back();
@@ -2169,7 +2169,7 @@ TEST_F(BuildWithDepsLogTest, DepFileDepsLogCanonicalize) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
     EXPECT_TRUE(builder.AddTarget("a/b/c/d/e/fo o.o", &err));
     ASSERT_EQ("", err);
@@ -2192,7 +2192,7 @@ TEST_F(BuildWithDepsLogTest, DepFileDepsLogCanonicalize) {
     ASSERT_TRUE(deps_log.OpenForWrite("ninja_deps", &err));
     ASSERT_EQ("", err);
 
-    Builder builder(&state, config_, NULL, &deps_log, &fs_);
+    Builder builder(&state, config_, nullptr, &deps_log, &fs_);
     builder.command_runner_.reset(&command_runner_);
 
     Edge* edge = state.edges_.back();

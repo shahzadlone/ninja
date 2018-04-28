@@ -81,7 +81,7 @@ BuildStatus::BuildStatus(const BuildConfig& config)
     : config_(config),
       start_time_millis_(GetTimeMillis()),
       started_edges_(0), finished_edges_(0), total_edges_(0),
-      progress_status_format_(NULL),
+      progress_status_format_(nullptr),
       overall_rate_(), current_rate_(config.parallelism) {
 
   // Don't do anything fancy in verbose mode.
@@ -133,7 +133,7 @@ void BuildStatus::BuildEdgeFinished(Edge* edge,
     PrintStatus(edge, kEdgeFinished);
   if (printer_.is_smart_terminal()) {
     int oldest_start = INT_MAX;
-    Edge* oldest = NULL;
+    Edge* oldest = nullptr;
     for (i = running_edges_.begin(); i != running_edges_.end(); i++) {
       if (i->second < oldest_start) {
         oldest_start = i->second;
@@ -310,7 +310,7 @@ void Plan::Reset() {
 }
 
 bool Plan::AddTarget(Node* node, std::string* err) {
-  return AddSubTarget(node, NULL, err);
+  return AddSubTarget(node, nullptr, err);
 }
 
 bool Plan::AddSubTarget(Node* node, Node* dependent, std::string* err) {
@@ -362,7 +362,7 @@ bool Plan::AddSubTarget(Node* node, Node* dependent, std::string* err) {
 
 Edge* Plan::FindWork() {
   if (ready_.empty())
-    return NULL;
+    return nullptr;
   std::set<Edge*>::iterator e = ready_.begin();
   Edge* edge = *e;
   ready_.erase(e);
@@ -464,7 +464,7 @@ bool Plan::CleanNode(DependencyScan* scan, Node* node, std::string* err) {
 #endif
     if (find_if(begin, end, MEM_FN(&Node::dirty)) == end) {
       // Recompute most_recent_input.
-      Node* most_recent_input = NULL;
+      Node* most_recent_input = nullptr;
       for (std::vector<Node*>::iterator i = begin; i != end; ++i) {
         if (!most_recent_input || (*i)->mtime() > most_recent_input->mtime())
           most_recent_input = *i;
@@ -552,7 +552,7 @@ bool RealCommandRunner::StartCommand(Edge* edge) {
 
 bool RealCommandRunner::WaitForCommand(Result* result) {
   Subprocess* subproc;
-  while ((subproc = subprocs_.NextFinished()) == NULL) {
+  while ((subproc = subprocs_.NextFinished()) == nullptr) {
     bool interrupted = subprocs_.DoWork();
     if (interrupted)
       return false;
@@ -615,10 +615,10 @@ Node* Builder::AddTarget(const std::string& name, std::string* err) {
   Node* node = state_->LookupNode(name);
   if (!node) {
     *err = "unknown target: '" + name + "'";
-    return NULL;
+    return nullptr;
   }
   if (!AddTarget(node, err))
-    return NULL;
+    return nullptr;
   return node;
 }
 
