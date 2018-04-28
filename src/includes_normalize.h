@@ -18,7 +18,7 @@
 
 /// Utility functions for normalizing include paths on Windows.
 /// TODO: this likely duplicates functionality of CanonicalizePath; refactor.
-struct IncludesNormalize {
+struct IncludesNormalize final {
   /// Normalize path relative to |relative_to|.
   IncludesNormalize(const std::string& relative_to);
 

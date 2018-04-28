@@ -21,7 +21,7 @@ struct Node;
 struct Edge;
 
 /// Runs the process of creating GraphViz .dot file output.
-struct GraphViz {
+struct GraphViz final {
   void Start();
   void AddTarget(Node* node);
   void Finish();

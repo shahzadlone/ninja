@@ -21,7 +21,7 @@
 #include <string_view>
 
 /// Parser for the dependency information emitted by gcc's -M flags.
-struct DepfileParser {
+struct DepfileParser final {
   /// Parse an input file.  Input must be NUL-terminated.
   /// Warning: may mutate the content in-place and parsed string_views are
   /// pointers within it.

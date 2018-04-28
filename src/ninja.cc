@@ -58,7 +58,7 @@ namespace {
 struct Tool;
 
 /// Command-line options.
-struct Options {
+struct Options final {
   /// Build file to load.
   const char* input_file;
 
@@ -77,7 +77,7 @@ struct Options {
 
 /// The Ninja main() loads up a series of data structures; various tools need
 /// to poke into these, so store them as fields on an object.
-struct NinjaMain : public BuildLogUser {
+struct NinjaMain final : public BuildLogUser {
   NinjaMain(const char* ninja_command, const BuildConfig& config) :
       ninja_command_(ninja_command), config_(config) {}
 
@@ -147,7 +147,7 @@ struct NinjaMain : public BuildLogUser {
   /// Dump the output requested by '-d stats'.
   void DumpMetrics();
 
-  virtual bool IsPathDead(std::string_view s) const {
+  bool IsPathDead(std::string_view s) const override final {
     Node* n = state_.LookupNode(s);
     if (!n || !n->in_edge())
       return false;
@@ -169,7 +169,7 @@ struct NinjaMain : public BuildLogUser {
 };
 
 /// Subtools, accessible via "-t foo".
-struct Tool {
+struct Tool final {
   /// Short name of the tool.
   const char* name;
 

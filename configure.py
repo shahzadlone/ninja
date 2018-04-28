@@ -332,9 +332,11 @@ else:
               '-Wno-deprecated',
               '-Wno-missing-field-initializers',
               '-Wno-unused-parameter',
+              '-Wsuggest-override',
               '-fno-rtti',
               '-fno-exceptions',
-              '-fvisibility=hidden', '-pipe',
+              '-fvisibility=hidden',
+              '-pipe',
               '-DNINJA_PYTHON="%s"' % options.with_python]
     if options.debug:
         cflags += ['-D_GLIBCXX_DEBUG', '-D_GLIBCXX_DEBUG_PEDANTIC']

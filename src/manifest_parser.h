@@ -34,7 +34,7 @@ enum PhonyCycleAction {
   kPhonyCycleActionError,
 };
 
-struct ManifestParserOptions {
+struct ManifestParserOptions final {
   ManifestParserOptions()
       : dupe_edge_action_(kDupeEdgeActionWarn),
         phony_cycle_action_(kPhonyCycleActionWarn) {}
@@ -43,7 +43,7 @@ struct ManifestParserOptions {
 };
 
 /// Parses .ninja files.
-struct ManifestParser {
+struct ManifestParser final {
   ManifestParser(State* state, FileReader* file_reader,
                  ManifestParserOptions options = ManifestParserOptions());
 

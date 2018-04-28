@@ -31,7 +31,7 @@ struct Env {
 
 /// A tokenized std::string that contains variable references.
 /// Can be evaluated relative to an Env.
-struct EvalString {
+struct EvalString final {
   std::string Evaluate(Env* env) const;
 
   void Clear() { parsed_.clear(); }
@@ -51,7 +51,7 @@ private:
 };
 
 /// An invokable build command and associated metadata (description, etc.).
-struct Rule {
+struct Rule final {
   explicit Rule(const std::string& name) : name_(name) {}
 
   const std::string& name() const { return name_; }
@@ -73,12 +73,12 @@ struct Rule {
 
 /// An Env which contains a mapping of variables to values
 /// as well as a pointer to a parent scope.
-struct BindingEnv : public Env {
+struct BindingEnv final : public Env {
   BindingEnv() : parent_(nullptr) {}
   explicit BindingEnv(BindingEnv* parent) : parent_(parent) {}
 
   virtual ~BindingEnv() {}
-  virtual std::string LookupVariable(const std::string& var);
+  std::string LookupVariable(const std::string& var) override final;
 
   void AddRule(const Rule* rule);
   const Rule* LookupRule(const std::string& rule_name);
