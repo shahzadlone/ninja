@@ -29,7 +29,7 @@
 ManifestParser::ManifestParser(State* state, FileReader* file_reader,
                                ManifestParserOptions options)
     : state_(state), file_reader_(file_reader),
-      options_(options), quiet_(false) {
+      options_(options) {
   env_ = &state->bindings_;
 }
 

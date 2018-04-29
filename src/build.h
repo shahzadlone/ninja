@@ -115,14 +115,14 @@ private:
 /// subcommands.  This allows tests to abstract out running commands.
 /// RealCommandRunner is an implementation that actually runs commands.
 struct CommandRunner {
-  virtual ~CommandRunner() {}
+  virtual ~CommandRunner() = default;
   virtual bool CanRunMore() = 0;
   virtual bool StartCommand(Edge* edge) = 0;
 
   /// The result of waiting for a command.
   struct Result final {
-    Result() : edge(nullptr) {}
-    Edge* edge;
+    Result() = default;
+    Edge* edge = nullptr;
     ExitStatus status;
     std::string output;
     bool success() const { return status == ExitSuccess; }
@@ -242,7 +242,7 @@ struct BuildStatus final {
   /// Time the build started.
   int64_t start_time_millis_;
 
-  int started_edges_, finished_edges_, total_edges_;
+  int started_edges_ = 0, finished_edges_ = 0, total_edges_ = 0;
 
   /// Map of running edge to time the edge started running.
   typedef std::map<Edge*, int> RunningEdgeMap;
@@ -263,8 +263,7 @@ struct BuildStatus final {
   }
 
   struct RateInfo final {
-    RateInfo() : rate_(-1) {}
-
+    RateInfo() = default;
     void Restart() { stopwatch_.Restart(); }
     double Elapsed() const { return stopwatch_.Elapsed(); }
     double rate() { return rate_; }
@@ -275,12 +274,12 @@ struct BuildStatus final {
     }
 
   private:
-    double rate_;
+    double rate_ = -1; // This is awful. Use std::numeric_limits.
     Stopwatch stopwatch_;
   };
 
   struct SlidingRateInfo final {
-    SlidingRateInfo(int n) : rate_(-1), N(n), last_update_(-1) {}
+    SlidingRateInfo(int n) : N(n) {}
 
     void Restart() { stopwatch_.Restart(); }
     double rate() { return rate_; }
@@ -298,11 +297,11 @@ struct BuildStatus final {
     }
 
   private:
-    double rate_;
+    double rate_ = -1; // TODO: Use std::numeric_limts
     Stopwatch stopwatch_;
     const size_t N;
     std::queue<double> times_;
-    int last_update_;
+    int last_update_ = -1; // TODO: Use std::numeric_limits
   };
 
   mutable RateInfo overall_rate_;

@@ -35,11 +35,8 @@ struct State;
 struct Node final {
   Node(const std::string& path, uint64_t slash_bits)
       : path_(path),
-        slash_bits_(slash_bits),
-        mtime_(-1),
-        dirty_(false),
-        in_edge_(nullptr),
-        id_(-1) {}
+        slash_bits_(slash_bits)
+  {}
 
   /// Return false on error.
   bool Stat(DiskInterface* disk_interface, std::string* err);
@@ -107,22 +104,22 @@ private:
   ///   -1: file hasn't been examined
   ///   0:  we looked, and file doesn't exist
   ///   >0: actual file's mtime
-  TimeStamp mtime_;
+  TimeStamp mtime_ = -1;  // TODO: Use std::numeric_limits.
 
   /// Dirty is true when the underlying file is out-of-date.
   /// But note that Edge::outputs_ready_ is also used in judging which
   /// edges to build.
-  bool dirty_;
+  bool dirty_ = false;
 
   /// The Edge that produces this Node, or nullptr when there is no
   /// known edge to produce it.
-  Edge* in_edge_;
+  Edge* in_edge_ = nullptr;
 
   /// All Edges that use this Node as an input.
   std::vector<Edge*> out_edges_;
 
   /// A dense integer id for the node, assigned and used by DepsLog.
-  int id_;
+  int id_ = -1; // TODO: Use std::numeric_limits.
 };
 
 /// An edge in the dependency graph; links between Nodes using Rules.
@@ -133,9 +130,7 @@ struct Edge final {
     VisitDone
   };
 
-  Edge() : rule_(nullptr), pool_(nullptr), env_(nullptr), mark_(VisitNone),
-           outputs_ready_(false), deps_missing_(false),
-           implicit_deps_(0), order_only_deps_(0), implicit_outs_(0) {}
+  Edge() = default;
 
   /// Return true if all inputs' in-edges are ready.
   bool AllInputsReady() const;
@@ -156,14 +151,14 @@ struct Edge final {
 
   void Dump(const char* prefix="") const;
 
-  const Rule* rule_;
-  Pool* pool_;
+  const Rule* rule_ = nullptr;
+  Pool* pool_ = nullptr;
   std::vector<Node*> inputs_;
   std::vector<Node*> outputs_;
-  BindingEnv* env_;
-  VisitMark mark_;
-  bool outputs_ready_;
-  bool deps_missing_;
+  BindingEnv* env_ = nullptr;
+  VisitMark mark_ = VisitNone;
+  bool outputs_ready_ = false;
+  bool deps_missing_ = false;
 
   const Rule& rule() const { return *rule_; }
   Pool* pool() const { return pool_; }
@@ -178,8 +173,8 @@ struct Edge final {
   //                     don't cause the target to rebuild.
   // These are stored in inputs_ in that order, and we keep counts of
   // #2 and #3 when we need to access the various subsets.
-  int implicit_deps_;
-  int order_only_deps_;
+  int implicit_deps_ = 0;
+  int order_only_deps_ = 0;
   bool is_implicit(size_t index) {
     return index >= inputs_.size() - order_only_deps_ - implicit_deps_ &&
         !is_order_only(index);
@@ -193,7 +188,7 @@ struct Edge final {
   // 2) implicit outs, which the target generates but are not part of $out.
   // These are stored in outputs_ in that order, and we keep a count of
   // #2 to use when we need to access the various subsets.
-  int implicit_outs_;
+  int implicit_outs_ = 0;
   bool is_implicit_out(size_t index) const {
     return index >= outputs_.size() - implicit_outs_;
   }

@@ -45,7 +45,7 @@ namespace {
 
 /// A CommandRunner that doesn't actually run the commands.
 struct DryRunCommandRunner final : public CommandRunner {
-  virtual ~DryRunCommandRunner() {}
+  virtual ~DryRunCommandRunner() = default;
 
   // Overridden from CommandRunner:
   bool CanRunMore() override final;
@@ -80,9 +80,7 @@ bool DryRunCommandRunner::WaitForCommand(Result* result) {
 BuildStatus::BuildStatus(const BuildConfig& config)
     : config_(config),
       start_time_millis_(GetTimeMillis()),
-      started_edges_(0), finished_edges_(0), total_edges_(0),
-      progress_status_format_(nullptr),
-      overall_rate_(), current_rate_(config.parallelism) {
+      current_rate_(config.parallelism) {
 
   // Don't do anything fancy in verbose mode.
   if (config_.verbosity != BuildConfig::NORMAL)
@@ -507,7 +505,7 @@ void Plan::Dump() {
 
 struct RealCommandRunner final : public CommandRunner {
   explicit RealCommandRunner(const BuildConfig& config) : config_(config) {}
-  virtual ~RealCommandRunner() {}
+  virtual ~RealCommandRunner() = default;
   bool CanRunMore() override final;
   bool StartCommand(Edge* edge) override final;
   bool WaitForCommand(Result* result) override final;
