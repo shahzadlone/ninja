@@ -46,6 +46,7 @@ void RunBrowsePython(State* state, const char* ninja_command,
       }
 
       std::vector<const char *> command;
+      command.reserve(argc + 7);
       command.push_back(NINJA_PYTHON);
       command.push_back("-");
       command.push_back("--ninja-command");
