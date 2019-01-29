@@ -46,18 +46,25 @@ void RunBrowsePython(State* state, const char* ninja_command,
         break;
       }
 
+      static const char * staticArgs[] = {NINJA_PYTHON,
+                                          "-",
+                                          "--ninja-command",
+                                          ninja_command,
+                                          "-f",
+                                          input_file};
+
+      static size_t argSize = sizeof(staticArgs) / sizeof(*staticArgs);
+
       std::vector<const char *> command;
-      command.reserve(argc + 7);
-      command.push_back(NINJA_PYTHON);
-      command.push_back("-");
-      command.push_back("--ninja-command");
-      command.push_back(ninja_command);
-      command.push_back("-f");
-      command.push_back(input_file);
-      for (int i = 0; i < argc; i++) {
+      command.reserve(argSize + argc + 1);
+      for (size_t i = 0; i < argSize; ++i) {
+          command.push_back(staticArgs[i]);
+      }
+      for (int i = 0; i < argc; ++i) {
           command.push_back(argv[i]);
       }
-      command.push_back(NULL);
+      command.push_back(nullptr);
+
       execvp(command[0], (char**)&command[0]);
       if (errno == ENOENT) {
         printf("ninja: %s is required for the browse tool\n", NINJA_PYTHON);
