@@ -47,7 +47,7 @@ void RunBrowsePython(State* state, const char* ninja_command,
 
       std::vector<const char *> command = {NINJA_PYTHON, "-", "--ninja-command",
                                            ninja_command, "-f", input_file}
-      command.reserve(argc + 1);
+      command.reserve(command.size() + argc + 1);
       for (int i = 0; i < argc; ++i) {
           command.push_back(argv[i]);
       }
