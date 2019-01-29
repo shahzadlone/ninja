@@ -45,7 +45,18 @@ void RunBrowsePython(State* state, const char* ninja_command,
         break;
       }
 
-      std::vector<const char *> command = {NINJA_PYTHON, "-", "--ninja-command",
+    static constexpr const char * staticArgs[] = {NINJA_PYTHON, "-", "--ninja-command", ninja_command, "-f", input_file};
+    static constexpr size_t argSize = sizeof(staticArgs)/sizeof(*staticArgs);
+    std::vector<const char *> command;
+    command.reserve(argSize + argc + 1);
+    for(size_t i = 0; i < argSize; ++i)
+    {
+        command.push_back(staticArgs[i]);
+    }
+    for (int i = 0; i < argc; ++i) {
+        command.push_back(argv[i]);
+    }
+    command.push_back(nullptr);
                                            ninja_command, "-f", input_file}
       command.reserve(command.size() + argc + 1);
       for (int i = 0; i < argc; ++i) {
