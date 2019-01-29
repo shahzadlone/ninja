@@ -45,15 +45,10 @@ void RunBrowsePython(State* state, const char* ninja_command,
         break;
       }
 
-      std::vector<const char *> command;
-      command.reserve(argc + 7);
-      command.push_back(NINJA_PYTHON);
-      command.push_back("-");
-      command.push_back("--ninja-command");
-      command.push_back(ninja_command);
-      command.push_back("-f");
-      command.push_back(input_file);
-      for (int i = 0; i < argc; i++) {
+      std::vector<const char *> command = {NINJA_PYTHON, "-", "--ninja-command",
+                                           ninja_command, "-f", input_file}
+      command.reserve(argc + 1);
+      for (int i = 0; i < argc; ++i) {
           command.push_back(argv[i]);
       }
       command.push_back(nullptr);
